@@ -1,0 +1,4 @@
+rootProject.name = 'SeaBattle_2'
+include 'server'
+include 'client'
+
