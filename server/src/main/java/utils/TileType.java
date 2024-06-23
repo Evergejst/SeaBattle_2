@@ -6,5 +6,6 @@ public enum TileType {
     SEA,
     SHIP,
     HIT,
-    MISS
+    MISS,
+    KILL
 }

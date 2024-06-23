@@ -8,18 +8,11 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.net.InetSocketAddress;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 import java.util.Random;
-import java.io.File;
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.util.zip.ZipEntry;
-import java.util.zip.ZipOutputStream;
 
 public class GameServer extends WebSocketServer {
 
@@ -35,10 +28,10 @@ public class GameServer extends WebSocketServer {
     private PrintWriter logWriter;
     private PrintWriter saveWriter;
     private PrintWriter saveWriters;
-    private long startTime;
+    private WorkWithTime workWithTime = new WorkWithTime();
     private static final String GAMES_DIRECTORY = ".\\";
-    private static final String GAME_FILE_EXTENSION = ".txt";
     private boolean isAdmin = false;
+    private final LoggingGame loggingGame = new LoggingGame();
 
     public GameServer(int port) {
         super(new InetSocketAddress(port));
@@ -128,7 +121,8 @@ public class GameServer extends WebSocketServer {
             }
             nameSaveFile = "save_" + (numSave + 1) + ".txt";
             saveWriter = new PrintWriter(new FileWriter(nameSaveFile, true));
-            logWriter.println("Game started at " + getCurrentTime());
+            String startTime = workWithTime.getCurrentTime();
+            logWriter.println("Game started at " + workWithTime.getCurrentTime());
             logWriter.println("Player 1: " + playerName1);
             if (singlePlayerMode) {
                 logWriter.println("Player 2: Computer");
@@ -136,7 +130,7 @@ public class GameServer extends WebSocketServer {
                 logWriter.println("Player 2: " + playerName2);
             }
             logWriter.println();
-            startTime = System.currentTimeMillis();
+            workWithTime.setStartTime(System.currentTimeMillis());
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -215,13 +209,13 @@ public class GameServer extends WebSocketServer {
         String fileName = words[1];
         switch (command) {
             case "delete":
-                deleteGame(fileName);
+                FileDeleter.deleteGame(GAMES_DIRECTORY, fileName);
                 break;
             case "archive":
-                archiveGame(fileName);
+                FileArchiver.archiveGame(GAMES_DIRECTORY, fileName);
                 break;
             case "view":
-                formListMoves(conn, fileName);
+                FormerListMoves.formListMoves(conn, fileName);
                 break;
         }
         conn.send("Keep typing commands\n" +
@@ -251,19 +245,19 @@ public class GameServer extends WebSocketServer {
         Player opponentPlayer = conn == players.get(0) ? player2 : player1;
 
         String moveResult = currentPlayer.fire(opponentPlayer.getBoard(), new Tile(move[0], move[1]));
-        logMove(saveWriter, currentPlayer.getName(), move[0], move[1], moveResult);
+        loggingGame.logMove(saveWriter, currentPlayer.getName(), move[0], move[1], moveResult);
         saveWriter.println(currentPlayer.getBoard().drawBoardForLog());
         saveWriter.flush();
 
         conn.send(moveResult);
         conn.send(opponentPlayer.getBoard().drawBoard(true));
         if (opponentPlayer.getBoard().allShipsSunk()) {
-            logMove(saveWriter, opponentPlayer.getName(), move[0], move[1], moveResult);
+            loggingGame.logMove(saveWriter, opponentPlayer.getName(), move[0], move[1], moveResult);
             saveWriter.println(opponentPlayer.getBoard().drawBoardForLog());
             saveWriter.flush();
             saveWriters.println(nameSaveFile);
             saveWriters.flush();
-            logGameEnd(currentPlayer, opponentPlayer);
+            loggingGame.logGameEnd(logWriter, currentPlayer, opponentPlayer, workWithTime.getStartTime());
             conn.send("You win!");
             opponent.send("You lose!");
             try {
@@ -285,12 +279,12 @@ public class GameServer extends WebSocketServer {
         String moveResult;
         if (player1Turn) {
             moveResult = currentPlayer.fire(opponentPlayer.getBoard(), new Tile(move[0], move[1]));
-            logMove(saveWriter, currentPlayer.getName(), move[0], move[1], moveResult);
+            loggingGame.logMove(saveWriter, currentPlayer.getName(), move[0], move[1], moveResult);
             saveWriter.println(currentPlayer.getBoard().drawBoardForLog());
             saveWriter.flush();
         } else {
             moveResult = opponentPlayer.fire(currentPlayer.getBoard(), new Tile(move[0], move[1]));
-            logMove(saveWriter, opponentPlayer.getName(), move[0], move[1], moveResult);
+            loggingGame.logMove(saveWriter, opponentPlayer.getName(), move[0], move[1], moveResult);
             saveWriter.println(opponentPlayer.getBoard().drawBoardForLog());
             saveWriter.flush();
         }
@@ -300,7 +294,7 @@ public class GameServer extends WebSocketServer {
         if (opponentPlayer.getBoard().allShipsSunk()) {
             saveWriters.println(nameSaveFile);
             saveWriters.flush();
-            logGameEnd(currentPlayer, opponentPlayer);
+            loggingGame.logGameEnd(logWriter, currentPlayer, opponentPlayer, workWithTime.getStartTime());
             conn.send("You win!");
             try {
                 stop();
@@ -313,7 +307,7 @@ public class GameServer extends WebSocketServer {
             saveWriters.flush();
             saveWriters.println(nameSaveFile);
             saveWriters.flush();
-            logGameEnd(opponentPlayer, currentPlayer);
+            loggingGame.logGameEnd(logWriter, opponentPlayer, currentPlayer, workWithTime.getStartTime());
             conn.send("You loser!");
         }
         else {
@@ -324,145 +318,6 @@ public class GameServer extends WebSocketServer {
 
     private WebSocket getOpponent(WebSocket conn) {
         return conn == players.get(0) ? players.get(1) : players.get(0);
-    }
-
-    private void logMove(PrintWriter someWriter, String playerName, int x, int y, String result) {
-        if (someWriter != null) {
-            someWriter.printf("Move by %s at %s: (%d, %c) - %s%n", playerName, getCurrentTime(), x + 1, (char) ('A' + y), result);
-            someWriter.flush();
-        }
-    }
-
-    private void logGameEnd(Player winner, Player loser) {
-        if (logWriter != null) {
-            long endTime = System.currentTimeMillis();
-            long duration = (endTime - startTime) / 1000;
-
-            logWriter.println();
-            logWriter.println("Game ended at " + getCurrentTime());
-            logWriter.printf("Duration: %d seconds%n", duration);
-            logWriter.printf("Winner: %s%n", winner.getName());
-            logWriter.printf("Loser: %s%n", loser.getName());
-            logWriter.println("Final Boards:");
-            logWriter.printf("Player 1 (%s) Board:%n", player1.getName());
-            logWriter.println(winner.getBoard().drawBoardForLog());
-            logWriter.printf("Player 2 (%s) Board:%n", player2.getName());
-            logWriter.println(loser.getBoard().drawBoardForLog());
-            logWriter.println();
-
-            logWriter.close();
-        }
-    }
-
-    private String getCurrentTime() {
-        return new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date());
-    }
-
-    // Метод для удаления игры
-    private static boolean deleteGame(String gameFileName) {
-        File file = new File(GAMES_DIRECTORY, gameFileName);
-        boolean isExist = file.exists() && file.delete();
-        return isExist;
-    }
-
-    // Метод для архивирования игры
-    private static boolean archiveGame(String gameFileName) {
-        File file = new File(GAMES_DIRECTORY, gameFileName);
-        if (!file.exists()) {
-            return false;
-        }
-
-        try {
-            String ARCHIVE_DIRECTORY = "FLKsajfklsdj";
-            File archiveDir = new File(ARCHIVE_DIRECTORY);
-            if (!archiveDir.exists()) {
-                archiveDir.mkdir();
-            }
-
-            String zipFileName = gameFileName.replace(GAME_FILE_EXTENSION, ".zip");
-            FileOutputStream fos = new FileOutputStream(new File(ARCHIVE_DIRECTORY, zipFileName));
-            ZipOutputStream zos = new ZipOutputStream(fos);
-            zos.putNextEntry(new ZipEntry(file.getName()));
-
-            FileInputStream fis = new FileInputStream(file);
-            byte[] buffer = new byte[1024];
-            int length;
-            while ((length = fis.read(buffer)) > 0) {
-                zos.write(buffer, 0, length);
-            }
-            zos.closeEntry();
-            zos.close();
-            fis.close();
-            fos.close();
-            return true;
-
-        } catch (IOException e) {
-            e.printStackTrace();
-            return false;
-        }
-    }
-
-    // Метод для воспроизведения игры
-    private static void formListMoves(WebSocket conn, String gameFileName) {
-        // Считать журнал игры из файла
-        List<String> gameLogs = readGameLog(gameFileName);
-
-        // Проверка на пустоту журнала
-        if (gameLogs.isEmpty()) {
-            System.out.println("No game log data found.");
-            return; // Завершаем метод, если журнал пуст
-        }
-
-        // Разделение журнала на ходы
-        List<List<String>> moves = parseMoves(gameLogs);
-
-        // Преобразуем объект moves в строку
-        String movesString = serializeMoves(moves);
-
-        // Отправляем строку через веб-сокет
-        conn.send(movesString);
-    }
-
-    private static String serializeMoves(List<List<String>> moves) {
-        StringBuilder sb = new StringBuilder();
-        for (List<String> move : moves) {
-            for (String line : move) {
-                sb.append(line).append("\n"); // Разделяем строки символом новой строки
-            }
-            sb.append("\n"); // Разделяем ходы пустой строкой
-        }
-        return sb.toString();
-    }
-
-    private static List<String> readGameLog(String filePath) {
-        List<String> gameLogs = new ArrayList<>();
-        try {
-            gameLogs = Files.readAllLines(Paths.get(filePath));
-        } catch (IOException e) {
-            System.err.println("Error reading game log: " + e.getMessage());
-        }
-        return gameLogs;
-    }
-
-    private static List<List<String>> parseMoves(List<String> gameLogs) {
-        List<List<String>> moves = new ArrayList<>();
-        List<String> currentMove = new ArrayList<>();
-
-        for (String line : gameLogs) {
-            if (line.startsWith("Move by")) {
-                if (!currentMove.isEmpty()) {
-                    moves.add(new ArrayList<>(currentMove));
-                    currentMove.clear();
-                }
-            }
-            currentMove.add(line);
-        }
-
-        if (!currentMove.isEmpty()) {
-            moves.add(currentMove);
-        }
-
-        return moves;
     }
 
     public static void main(String[] args) {
