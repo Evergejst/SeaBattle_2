@@ -1,8 +1,9 @@
 package utils;
 
-// Enum orientation. Defines the orientation of a ship.
-// It could be either horizontal or vertical.
+/**
+ * Перечисление Orientation представляет ориентации объектов, таких как корабли на игровом поле.
+ */
 public enum Orientation {
-    VERTICAL,
-    HORIZONTAL
+    VERTICAL,    // Вертикальная ориентация
+    HORIZONTAL   // Горизонтальная ориентация
 }

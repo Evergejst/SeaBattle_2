@@ -1,10 +1,15 @@
 package exceptions;
 
-// Custom exception. Raised when a placement of a new ship overlaps another already placed ship
+/**
+ * Исключение OverlapTilesException используется для обработки ситуаций, когда корабль перекрывает
+ * другой корабль при размещении на игровом поле.
+ */
 public class OverlapTilesException extends Exception {
 
-    // Constructor
-    // Input: Message of exception.
+    /**
+     * Конструктор класса OverlapTilesException.
+     * @param message сообщение об ошибке
+     */
     public OverlapTilesException(String message) {
         super(message);
     }

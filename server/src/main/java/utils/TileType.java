@@ -1,11 +1,11 @@
 package utils;
 
-// Enum TileType. Defines the types of a tile.
-// Any tile could be sea type, ship type, hit type, miss type.
+/**
+ * Перечисление TileType представляет типы плиток на игровом поле.
+ */
 public enum TileType {
-    SEA,
-    SHIP,
-    HIT,
-    MISS,
-    KILL
+    SEA,  // Море (пустая плитка)
+    SHIP, // Корабль
+    HIT,  // Попадание по кораблю
+    MISS  // Промах
 }

@@ -1,10 +1,15 @@
 package exceptions;
 
-// Custom exception. Raised when player tries to place a ship outside the board.
+/**
+ * Исключение OversizeException используется для обработки ситуаций, когда размер корабля превышает
+ * допустимые границы игрового поля при его размещении.
+ */
 public class OversizeException extends Exception {
 
-    // Constructor
-    // Input: Message of exception.
+    /**
+     * Конструктор класса OversizeException.
+     * @param message сообщение об ошибке
+     */
     public OversizeException(String message) {
         super(message);
     }

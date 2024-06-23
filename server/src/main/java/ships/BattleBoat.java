@@ -1,7 +1,17 @@
 package ships;
 
-public class BattleBoat extends Ship{
+/**
+ * Класс BattleBoat представляет собой тип корабля Battle Boat (боевая лодка) в игре "Морской бой".
+ * Унаследован от абстрактного класса Ship.
+ * Боевая лодка имеет размер 1 ячейку на игровом поле.
+ */
+public class BattleBoat extends Ship {
+
+    /**
+     * Конструктор класса BattleBoat.
+     * Вызывает конструктор суперкласса Ship с указанием размера 1.
+     */
     public BattleBoat() {
-        super(1);
+        super(1); // Размер боевой лодки составляет 1 ячейку
     }
 }

@@ -1,12 +1,17 @@
 package ships;
 
-// Battleship class. Extends abstract Ship class
+/**
+ * Класс BattleShip представляет собой тип корабля Battle Ship (боевой корабль) в игре "Морской бой".
+ * Унаследован от абстрактного класса Ship.
+ * Боевой корабль имеет размер 4 ячейки на игровом поле.
+ */
 public class BattleShip extends Ship {
 
-    // Constructor.
-    // Calls the parent constructor setting the ship size.
+    /**
+     * Конструктор класса BattleShip.
+     * Вызывает конструктор суперкласса Ship с указанием размера 4.
+     */
     public BattleShip() {
-        super(4);
+        super(4); // Размер боевого корабля составляет 4 ячейки
     }
-
 }

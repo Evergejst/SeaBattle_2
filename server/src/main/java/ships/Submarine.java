@@ -1,12 +1,17 @@
 package ships;
 
-// Submarine class. Extends abstract Ship class
+/**
+ * Класс Submarine представляет собой тип корабля подводной лодки в игре "Морской бой".
+ * Он наследует абстрактный класс Ship и представляет собой корабль с определенным размером.
+ */
 public class Submarine extends Ship {
 
-    // Constructor.
-    // Calls the parent constructor setting the ship size.
+    /**
+     * Конструктор класса Submarine.
+     * Устанавливает размер подводной лодки (количество ячеек, которые занимает на игровом поле).
+     */
     public Submarine() {
-        super(3);
+        super(3); // Размер подводной лодки равен 3
     }
 
 }

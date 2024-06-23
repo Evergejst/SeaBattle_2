@@ -11,29 +11,37 @@ import utils.TileType;
 import java.util.ArrayList;
 import java.util.List;
 
-// Abstract class ship.
-// Has all the methods of a ship. Inherited by all kinds of ships.
+/**
+ * Абстрактный класс Ship представляет собой базовый класс для всех типов кораблей в игре "Морской бой".
+ * Он содержит методы и атрибуты, общие для всех кораблей.
+ */
 public abstract class Ship {
 
-    // Ship size data member.
     private Integer shipSize;
 
-    // Constructor
-    // Initializes a ship with it's size.
+    /**
+     * Конструктор класса Ship.
+     * Устанавливает размер корабля.
+     *
+     * @param shipSize Размер корабля (количество ячеек, которые занимает корабль на игровом поле).
+     */
     Ship(Integer shipSize) {
         this.shipSize = shipSize;
     }
 
-    // Method: placeShip. Places the ship on the board
-    // Inputs:
-    // Board: The board. Depends if you are the player or the computer
-    // Starting tile: The starting tile of the ship
-    // Orientation: The orientation of the ship Vertical/Horizontal
+    /**
+     * Метод для размещения корабля на игровом поле.
+     *
+     * @param board        Игровое поле, на котором размещается корабль.
+     * @param startingTile Начальная плитка (ячейка), с которой начинается размещение корабля.
+     * @param orientation  Ориентация корабля (вертикальная или горизонтальная).
+     * @throws OversizeException        Исключение, если корабль выходит за границы игрового поля.
+     * @throws OverlapTilesException    Исключение, если корабль перекрывает другой корабль.
+     * @throws AdjacentTilesException   Исключение, если корабль соприкасается с другим кораблем.
+     */
     public void placeShip(Board board, Tile startingTile, Orientation orientation)
             throws OversizeException, OverlapTilesException, AdjacentTilesException {
 
-        // Checks if the ship is inside the board, if it has adjacent ships and if overlaps another ship.
-        // If no exception is raised then the ship is placed.
         if (!shipIsInsideBoard(board, startingTile, orientation))
             throw new OversizeException("[Ship] \t" + this.getClass().getSimpleName() + " size out of bounds.");
         if (overlapsShip(board, startingTile, orientation))
@@ -41,7 +49,6 @@ public abstract class Ship {
         if (isAdjacentToShip(board, startingTile, orientation))
             throw new AdjacentTilesException("[Ship] \t" + this.getClass().getSimpleName() + " is adjacent to another ship.");
 
-        // Places the ship depending on starting tile and orientation
         if (orientation == Orientation.VERTICAL) {
             for (int i = 0; i < getShipSize(); i++) {
                 board.getTile(new Tile(startingTile.getX() + i, startingTile.getY())).setType(TileType.SHIP);
@@ -55,11 +62,14 @@ public abstract class Ship {
         System.out.println("[Ship]  \t" + this.getClass().getSimpleName() + " placed successfully!");
     }
 
-    // Method: shipIsInsideBoard. Checks if the ship that will be placed is inside the board.
-    // Inputs:
-    // Board: The board. Depends if you are the player or the computer
-    // Starting tile: The starting tile of the ship
-    // Orientation: The orientation of the ship Vertical/Horizontal
+    /**
+     * Метод для проверки, находится ли корабль в пределах игрового поля.
+     *
+     * @param board       Игровое поле.
+     * @param startingTile Начальная плитка (ячейка), с которой начинается размещение корабля.
+     * @param orientation Ориентация корабля (вертикальная или горизонтальная).
+     * @return true, если корабль полностью находится в пределах игрового поля, иначе false.
+     */
     private boolean shipIsInsideBoard(Board board, Tile startingTile, Orientation orientation) {
 
         boolean shipIsInsideBoard = true;
@@ -79,15 +89,18 @@ public abstract class Ship {
                 }
             }
         }
-        // Returns true if the ship is inside board and false if not.
+
         return shipIsInsideBoard;
     }
 
-    // Method: overlapsShip. Checks if the ship that will be placed overlaps another ship.
-    // Inputs:
-    // Board: The board. Depends if you are the player or the computer
-    // Starting tile: The starting tile of the ship
-    // Orientation: The orientation of the ship Vertical/Horizontal
+    /**
+     * Метод для проверки, перекрывает ли корабль другой корабль на игровом поле.
+     *
+     * @param board       Игровое поле.
+     * @param startingTile Начальная плитка (ячейка), с которой начинается размещение корабля.
+     * @param orientation Ориентация корабля (вертикальная или горизонтальная).
+     * @return true, если корабль перекрывает другой корабль, иначе false.
+     */
     private boolean overlapsShip(Board board, Tile startingTile, Orientation orientation) {
 
         boolean overlapsShip = false;
@@ -107,15 +120,18 @@ public abstract class Ship {
                 }
             }
         }
-        // Returns true if the new ship overlaps another ship and false if not.
+
         return overlapsShip;
     }
 
-    // Method: isAdjacentToShip. Checks if the ship that will be placed is adjacent to another ship.
-    // Inputs:
-    // Board: The board. Depends if you are the player or the computer
-    // Starting tile: The starting tile of the ship
-    // Orientation: The orientation of the ship Vertical/Horizontal
+    /**
+     * Метод для проверки, соприкасается ли корабль с другим кораблем на игровом поле.
+     *
+     * @param board       Игровое поле.
+     * @param startingTile Начальная плитка (ячейка), с которой начинается размещение корабля.
+     * @param orientation Ориентация корабля (вертикальная или горизонтальная).
+     * @return true, если корабль соприкасается с другим кораблем, иначе false.
+     */
     private boolean isAdjacentToShip(Board board, Tile startingTile, Orientation orientation) {
 
         boolean isAdjacentToShip = false;
@@ -145,12 +161,15 @@ public abstract class Ship {
             }
         }
 
-        // Returns true if the ship is adjacent to another ship and false if not.
         return isAdjacentToShip;
     }
 
-    // Getter. Returns the size of the ship.
+    /**
+     * Возвращает размер корабля.
+     *
+     * @return Размер корабля.
+     */
     private Integer getShipSize() {
-          return this.shipSize;
+        return this.shipSize;
     }
 }

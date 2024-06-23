@@ -6,11 +6,19 @@ import java.util.Scanner;
 import java.util.List;
 import java.util.ArrayList;
 
+/**
+ * Класс GameClient представляет клиентскую часть для игры в морской бой через WebSocket.
+ * Он обеспечивает подключение к серверу, отправку и прием сообщений, управление игровыми действиями игрока.
+ */
 public class GameClient extends WebSocketClient {
 
     private Scanner scanner = new Scanner(System.in);
     private static final int MAX_MESSAGE_SIZE = 1024; // Максимальный размер сообщения
 
+    /**
+     * Конструктор для создания клиента WebSocket.
+     * @param serverUri URI сервера, к которому осуществляется подключение.
+     */
     public GameClient(URI serverUri) {
         super(serverUri);
     }
@@ -57,17 +65,12 @@ public class GameClient extends WebSocketClient {
         ex.printStackTrace();
     }
 
+    /**
+     * Метод для выполнения хода игроком.
+     */
     private void makeMove() {
-
-        System.out.print("Enter your move (format: x y): ");
+        System.out.print("Enter your move (format: x,y): ");
         String move = scanner.nextLine();
-        try {
-            String[] parts = move.split(",");
-            Integer[] intMove = new Integer[]{Integer.parseInt(parts[0]) - 1, parts[1].charAt(0) - 'A'};
-        }
-        catch (Exception e) {
-            makeMove();
-        }
 
         // Проверяем длину сообщения перед отправкой
         if (move.length() > MAX_MESSAGE_SIZE) {
@@ -83,6 +86,9 @@ public class GameClient extends WebSocketClient {
         }
     }
 
+    /**
+     * Метод для выбора режима игры (одиночная или многопользовательская).
+     */
     private void selectGameMode() {
         System.out.println("Do you want to play single (1) or multiplayer (2)?");
         String mode = scanner.nextLine();
@@ -95,6 +101,10 @@ public class GameClient extends WebSocketClient {
         }
     }
 
+    /**
+     * Метод для воспроизведения игры на основе переданных ходов.
+     * @param movesString Строка с сериализованными ходами.
+     */
     private static void replayGame(String movesString) {
         List<List<String>> moves = deserializeMoves(movesString);
 
@@ -109,6 +119,11 @@ public class GameClient extends WebSocketClient {
         }
     }
 
+    /**
+     * Метод для десериализации строкового представления ходов в список ходов.
+     * @param movesString Строка с сериализованными ходами.
+     * @return Список ходов.
+     */
     private static List<List<String>> deserializeMoves(String movesString) {
         List<List<String>> moves = new ArrayList<>();
         List<String> currentMove = new ArrayList<>();
@@ -134,6 +149,10 @@ public class GameClient extends WebSocketClient {
         return moves;
     }
 
+    /**
+     * Метод main для запуска клиента.
+     * @param args Параметры командной строки (не используются).
+     */
     public static void main(String[] args) {
         try {
             String serverUri = "ws://localhost:8887";

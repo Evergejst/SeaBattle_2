@@ -3,8 +3,16 @@ import org.java_websocket.WebSocket;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Класс FormerListMoves предназначен для формирования списка ходов игры из журнала и их передачи через веб-сокет.
+ */
 public class FormerListMoves {
 
+    /**
+     * Формирует список ходов из журнала игры и отправляет его через веб-сокет.
+     * @param conn WebSocket соединение, через которое отправляются ходы игры
+     * @param gameFileName Имя файла с журналом игры
+     */
     public static void formListMoves(WebSocket conn, String gameFileName) {
         // Считать журнал игры из файла
         List<String> gameLogs = FileReader.readGameLog(gameFileName);
@@ -25,6 +33,11 @@ public class FormerListMoves {
         conn.send(movesString);
     }
 
+    /**
+     * Преобразует список ходов в строковое представление.
+     * @param moves Список ходов игры
+     * @return Строковое представление всех ходов
+     */
     private static String serializeMoves(List<List<String>> moves) {
         StringBuilder sb = new StringBuilder();
         for (List<String> move : moves) {
@@ -36,6 +49,11 @@ public class FormerListMoves {
         return sb.toString();
     }
 
+    /**
+     * Разделяет журнал игры на отдельные ходы.
+     * @param gameLogs Список строк, содержащий журнал игры
+     * @return Список ходов, каждый из которых представлен как список строк
+     */
     private static List<List<String>> parseMoves(List<String> gameLogs) {
         List<List<String>> moves = new ArrayList<>();
         List<String> currentMove = new ArrayList<>();

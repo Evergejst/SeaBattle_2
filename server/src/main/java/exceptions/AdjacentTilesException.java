@@ -1,10 +1,15 @@
 package exceptions;
 
-// Custom exception. Raised when there is a ship adjacent to a placement of a new ship.
+/**
+ * Исключение AdjacentTilesException используется для обработки ситуаций, когда корабль пытаются разместить
+ * смежно с другим кораблем на игровом поле.
+ */
 public class AdjacentTilesException extends Exception {
 
-    // Constructor
-    // Input: message of exception.
+    /**
+     * Конструктор класса AdjacentTilesException.
+     * @param message сообщение об ошибке
+     */
     public AdjacentTilesException(String message) {
         super(message);
     }

@@ -5,7 +5,17 @@ import java.io.IOException;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
+/**
+ * Класс FileArchiver предназначен для архивирования файлов в формате ZIP.
+ */
 public class FileArchiver {
+
+    /**
+     * Архивирует указанный файл в заданной директории.
+     * @param gameDirectory Директория, в которой находится файл для архивирования
+     * @param gameFileName Имя файла для архивирования
+     * @return true, если файл был успешно архивирован; false, если файл не найден или архивирование не удалось
+     */
     public static boolean archiveGame(String gameDirectory, String gameFileName) {
         File file = new File(gameDirectory, gameFileName);
         if (!file.exists()) {
@@ -13,7 +23,7 @@ public class FileArchiver {
         }
 
         try {
-            String ARCHIVE_DIRECTORY = "FLKsajfklsdj";
+            String ARCHIVE_DIRECTORY = "FLKsajfklsdj"; // Директория для архивов (можно изменить по необходимости)
             File archiveDir = new File(ARCHIVE_DIRECTORY);
             if (!archiveDir.exists()) {
                 archiveDir.mkdir();

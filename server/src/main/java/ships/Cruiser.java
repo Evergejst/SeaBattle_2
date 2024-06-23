@@ -1,12 +1,17 @@
 package ships;
 
-// Cruiser class. Extends abstract Ship class
+/**
+ * Класс Cruiser представляет собой тип корабля Cruiser (крейсер) в игре "Морской бой".
+ * Унаследован от абстрактного класса Ship.
+ * Крейсер имеет размер 3 ячейки на игровом поле.
+ */
 public class Cruiser extends Ship {
 
-    // Constructor.
-    // Calls the parent constructor setting the ship size.
+    /**
+     * Конструктор класса Cruiser.
+     * Вызывает конструктор суперкласса Ship с указанием размера 3.
+     */
     public Cruiser() {
-        super(3);
+        super(3); // Размер крейсера составляет 3 ячейки
     }
-
 }

@@ -1,12 +1,17 @@
 package ships;
 
-// Destroyer class. Extends abstract Ship class
+/**
+ * Класс Destroyer представляет собой тип корабля Destroyer (эсминец) в игре "Морской бой".
+ * Унаследован от абстрактного класса Ship.
+ * Эсминец имеет размер 2 ячейки на игровом поле.
+ */
 public class Destroyer extends Ship {
 
-    // Constructor.
-    // Calls the parent constructor setting the ship size.
+    /**
+     * Конструктор класса Destroyer.
+     * Вызывает конструктор суперкласса Ship с указанием размера 2.
+     */
     public Destroyer() {
-        super(2);
+        super(2); // Размер эсминца составляет 2 ячейки
     }
-
 }
